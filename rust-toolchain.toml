@@ -1,2 +1,5 @@
+# このファイルはRustプロジェクトで使用するツールチェーンのバージョンを指定します。
+# [toolchain] セクションでは、使用するRustのチャンネルやバージョンを設定します。
+
 [toolchain]
-channel = "nightly"
+channel = "nightly"  # Rustのnightlyチャンネルを使用することを指定します。

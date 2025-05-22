@@ -1,58 +1,62 @@
+# このファイルはRustプロジェクトのパッケージ管理・ビルド設定を行うCargoの設定ファイルです。
+# 各セクションやフィールドは、パッケージ情報、依存関係、ビルドプロファイル、機能フラグなどを定義します。
+
 [package]
-name = "edit"
-version = "1.0.0"
-edition = "2024"
-rust-version = "1.87"
-repository = "https://github.com/microsoft/edit"
-homepage = "https://github.com/microsoft/edit"
-license = "MIT"
+name = "edit"                        # パッケージ名
+version = "1.0.0"                    # バージョン
+edition = "2024"                     # Rustエディション
+rust-version = "1.87"                # 必要なRustの最小バージョン
+repository = "https://github.com/microsoft/edit"  # リポジトリURL
+homepage = "https://github.com/microsoft/edit"    # ホームページURL
+license = "MIT"                      # ライセンス
 
 [[bench]]
-name = "lib"
-harness = false
+name = "lib"                         # ベンチマークターゲット名
+harness = false                      # 独自のベンチマークハーネスを使用
 
 [features]
-debug-layout = []
-debug-latency = []
+debug-layout = []                    # レイアウトデバッグ用の機能フラグ
+debug-latency = []                   # レイテンシデバッグ用の機能フラグ
 
 # We use `opt-level = "s"` as it significantly reduces binary size.
 # We could then use the `#[optimize(speed)]` attribute for spot optimizations.
 # Unfortunately, that attribute currently doesn't work on intrinsics such as memset.
 [profile.release]
-codegen-units = 1           # reduces binary size by ~2%
-debug = "full"              # No one needs an undebuggable release binary
-lto = true                  # reduces binary size by ~14%
-opt-level = "s"             # reduces binary size by ~25%
-panic = "abort"             # reduces binary size by ~50% in combination with -Zbuild-std-features=panic_immediate_abort
-split-debuginfo = "packed"  # generates a separate *.dwp/*.dSYM so the binary can get stripped
-strip = "symbols"           # See split-debuginfo - allows us to drop the size by ~65%
-incremental = true          # Improves re-compile times
+codegen-units = 1           # バイナリサイズを約2%削減
+debug = "full"              # リリースバイナリでもデバッグ情報を保持
+lto = true                  # リンク時最適化でバイナリサイズを約14%削減
+opt-level = "s"             # バイナリサイズを約25%削減
+panic = "abort"             # panic時にアボートし、バイナリサイズを約50%削減
+split-debuginfo = "packed"  # デバッグ情報を分離し、バイナリをストリップ可能に
+strip = "symbols"           # シンボルをストリップし、バイナリサイズを約65%削減
+incremental = true          # インクリメンタルビルドで再コンパイルを高速化
 
 [profile.bench]
-codegen-units = 16          # Make compiling criterion faster (16 is the default, but profile.release sets it to 1)
-lto = "thin"                # Similarly, speed up linking by a ton
+codegen-units = 16          # ベンチマーク時のコンパイルを高速化
+lto = "thin"                # ベンチマーク時のリンクを高速化
 
 [dependencies]
+# プロジェクト共通の依存クレートを記述
 
 [target.'cfg(unix)'.dependencies]
-libc = "0.2"
+libc = "0.2"                # Unix環境用のlibc依存
 
 [target.'cfg(windows)'.build-dependencies]
-winres = "0.1"
+winres = "0.1"              # Windows用リソースビルド依存
 
 [target.'cfg(windows)'.dependencies.windows-sys]
-version = "0.59"
+version = "0.59"            # Windows APIバインディングのバージョン
 features = [
-    "Win32_Globalization",
-    "Win32_Security",
-    "Win32_Storage_FileSystem",
-    "Win32_System_Console",
-    "Win32_System_Diagnostics_Debug",
-    "Win32_System_IO",
-    "Win32_System_LibraryLoader",
-    "Win32_System_Memory",
-    "Win32_System_Threading",
+    "Win32_Globalization",      # グローバリゼーションAPI
+    "Win32_Security",           # セキュリティAPI
+    "Win32_Storage_FileSystem", # ファイルシステムAPI
+    "Win32_System_Console",     # コンソールAPI
+    "Win32_System_Diagnostics_Debug", # デバッグAPI
+    "Win32_System_IO",          # IO API
+    "Win32_System_LibraryLoader", # ライブラリローダーAPI
+    "Win32_System_Memory",      # メモリAPI
+    "Win32_System_Threading",   # スレッドAPI
 ]
 
 [dev-dependencies]
-criterion = { version = "0.5", features = ["html_reports"] }
+criterion = { version = "0.5", features = ["html_reports"] } # ベンチマーク用クレート
